@@ -121,7 +121,7 @@ async def monitor_triggers(user_id: int):
     async for message in app.get_chat_history(user_id, limit=3, offset_id=-1):
         await asyncio.sleep(2)
         me = await app.get_me()
-        if message.text:
+        if message.text and message.outgoing:
             get_status = message.text.lower() in cancel_triggers
             if get_status:
                 print(f"Обнаружено слово-триггер в чате пользователя {user_id}")
