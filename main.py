@@ -44,7 +44,7 @@ async def handle_message(client, message):
     if message.from_user.is_self and trigger_phrase:
 
         # Перезапуск воронки
-        if trigger_phrase in message.text:
+        if trigger_phrase in message.text and message.outgoing:
             try:
                 target_user_id = int(message.text.split(trigger_phrase)[-1].strip())
 
@@ -67,7 +67,7 @@ async def auto_responder(user_id):
     try:
         user = await get_user(user_id)
         user_status = user.status
-        if str(user_status) == "alive":
+        if user_status == "alive":
             msg_1_sent_time = None
             msg_2_sent_time = None
             while True:
@@ -77,7 +77,7 @@ async def auto_responder(user_id):
                     user = await get_user(user_id)
                     user_status = user.status
 
-                    if str(user_status) == "alive":
+                    if user_status == "alive":
                         await asyncio.sleep(360)
                         print(datetime.datetime.now())
                         await app.send_message(user_id, "msg_1")
@@ -88,7 +88,7 @@ async def auto_responder(user_id):
                     user = await get_user(user_id)
                     user_status = user.status
 
-                    if str(user_status) == "alive":
+                    if user_status == "alive":
                         if msg_1_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_1 = current_time - msg_1_sent_time
@@ -102,7 +102,7 @@ async def auto_responder(user_id):
                     user = await get_user(user_id)
                     user_status = user.status
 
-                    if str(user_status) == "alive":
+                    if user_status == "alive":
                         if msg_2_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_2 = current_time - msg_2_sent_time
@@ -110,7 +110,7 @@ async def auto_responder(user_id):
                                 print(datetime.datetime.now())
                                 await app.send_message(user_id, "msg_3")
 
-                if str(user_status) == "finished":
+                if user_status == "finished":
                     break
 
     except (UserIsBlocked, UserDeactivated, UserDeactivatedBan, PeerIdInvalid):
