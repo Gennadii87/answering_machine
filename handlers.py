@@ -1,12 +1,12 @@
 import datetime
 import time
 import asyncio
-from pyrogram import Client
+
 from pyrogram.errors import UserIsBlocked, UserDeactivated, UserDeactivatedBan, PeerIdInvalid
 from dao.base import get_user, add_user, update_user_status
 
 
-async def handle_message(client: Client, message):
+async def handle_message(client, message):
     """Обработчик сообщений"""
     trigger_phrase = "запустить для пользователя"
     user_id = message.from_user.id
@@ -38,7 +38,7 @@ async def handle_message(client: Client, message):
     await auto_responder(client, user_id)
 
 
-async def auto_responder(client: Client, user_id: int):
+async def auto_responder(client, user_id: int):
     """Функция автоответчика"""
     try:
         user = await get_user(user_id)
@@ -95,7 +95,7 @@ async def auto_responder(client: Client, user_id: int):
         await update_user_status(user_id, "dead", "заблокирован")
 
 
-async def monitor_triggers(client: Client, user_id: int):
+async def monitor_triggers(client, user_id: int):
     """Функция для мониторинга триггеров отмены"""
     cancel_triggers = ["прекрасно", "ожидать", "стоп"]
     message_count = 0
