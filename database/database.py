@@ -18,4 +18,3 @@ async def init_db():
     async with engine.begin() as conn:
         # await conn.run_sync(Base.metadata.drop_all)  # для теста дропаем таблицы, что бы не бороться с конфликтами
         await conn.run_sync(Base.metadata.create_all)
-
