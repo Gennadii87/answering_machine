@@ -41,23 +41,22 @@ async def handle_message(client, message):
     else:
         print(f"[Вы]: {message.text}")
 
-    if message.from_user.is_self and trigger_phrase:
+    if message.from_user.is_self and trigger_phrase in message.text:
 
         # Перезапуск воронки
-        if trigger_phrase in message.text and message.outgoing:
-            try:
-                target_user_id = int(message.text.split(trigger_phrase)[-1].strip())
+        try:
+            target_user_id = int(message.text.split(trigger_phrase)[-1].strip())
 
-                if not await get_user(target_user_id):
-                    me = await app.get_me()
-                    await app.send_message(me.id, f"пользователь {target_user_id} не найден.")
+            if not await get_user(target_user_id):
+                me = await app.get_me()
+                await app.send_message(me.id, f"пользователь {target_user_id} не найден.")
 
-                await update_user_status(target_user_id, "alive",
-                                         f"воронка для пользователя {target_user_id} обновлена")
+            await update_user_status(target_user_id, "alive",
+                                     f"воронка для пользователя {target_user_id} обновлена")
 
-                print(f"Статус пользователя {target_user_id} обновлен на 'alive'")
-            except ValueError:
-                print("Неверный формат идентификатора пользователя")
+            print(f"Статус пользователя {target_user_id} обновлен на 'alive'")
+        except ValueError:
+            print("Неверный формат идентификатора пользователя")
 
     await auto_responder(user_id)
 
