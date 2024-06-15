@@ -11,7 +11,7 @@ from database.service import check_user_exists
 import time
 import asyncio
 
-# инициализируем проверку таблицы, если нет, создаем
+# инициализируем таблицы
 check_user = check_user_exists
 
 
