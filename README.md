@@ -1,7 +1,7 @@
 # MY_CLIENT
 <h2>Автоответчик на pyrogram</h2>
 
-Установка пакетов <code>`pip install -r .\requirement.txt`</code> <br/>
+Установка пакетов <pre>`pip install -r .\requirement.txt`</pre> <br/>
 
 создайте файл `.env` и укажите там переменные, разместите в корне проекта <br/>
 
@@ -19,4 +19,4 @@
 
 </code>
 
-Запуск клиента <code>`python main.py`</code> <br/>
+Запуск клиента <pre>`python main.py`</pre> <br/>
