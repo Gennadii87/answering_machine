@@ -87,14 +87,14 @@ async def auto_responder(user_id):
                     user = await get_user(user_id)
                     user_status = user.status
 
-                if str(user_status) == "alive":
-                    if msg_1_sent_time is not None:
-                        current_time = time.time()
-                        interval_since_msg_1 = current_time - msg_1_sent_time
-                        if interval_since_msg_1 >= 2340:
-                            print(datetime.datetime.now())
-                            await app.send_message(user_id, "msg_2")
-                            msg_2_sent_time = time.time()
+                    if str(user_status) == "alive":
+                        if msg_1_sent_time is not None:
+                            current_time = time.time()
+                            interval_since_msg_1 = current_time - msg_1_sent_time
+                            if interval_since_msg_1 >= 2340:
+                                print(datetime.datetime.now())
+                                await app.send_message(user_id, "msg_2")
+                                msg_2_sent_time = time.time()
 
                 if not await monitor_triggers(user_id):
 
