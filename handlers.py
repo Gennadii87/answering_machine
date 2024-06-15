@@ -68,6 +68,7 @@ async def auto_responder(client: Client, user_id: int):
                         if msg_1_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_1 = current_time - msg_1_sent_time
+
                             if interval_since_msg_1 >= 2340:
                                 print(datetime.datetime.now())
                                 await client.send_message(user_id, "msg_2")
@@ -82,6 +83,7 @@ async def auto_responder(client: Client, user_id: int):
                         if msg_2_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_2 = current_time - msg_2_sent_time
+
                             if interval_since_msg_2 >= (1 * 24 * 3600 + 2 * 3600):
                                 print(datetime.datetime.now())
                                 await client.send_message(user_id, "msg_3")
@@ -100,6 +102,7 @@ async def monitor_triggers(client: Client, user_id: int):
     async for message in client.get_chat_history(user_id, limit=3, offset_id=-1):
         await asyncio.sleep(2)
         me = await client.get_me()
+
         if message.text and message.outgoing:
             get_status = message.text.lower() in cancel_triggers
             if get_status:
