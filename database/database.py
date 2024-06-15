@@ -6,9 +6,7 @@ from .config import conn_url
 
 Base = declarative_base()
 
-
 engine = create_async_engine(conn_url, echo=False)
-
 
 async_session = async_sessionmaker(expire_on_commit=False, autoflush=False, class_=AsyncSession, bind=engine)
 
