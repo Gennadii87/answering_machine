@@ -82,6 +82,11 @@ async def auto_responder(user_id):
                         await app.send_message(user_id, "msg_1")
                         msg_1_sent_time = time.time()
 
+                if not await monitor_triggers(user_id):
+
+                    user = await get_user(user_id)
+                    user_status = user.status
+
                 if str(user_status) == "alive":
                     if msg_1_sent_time is not None:
                         current_time = time.time()
