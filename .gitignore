@@ -1,3 +1,4 @@
 .env
 my_account.session
 text.py
+*.cpython-39.pyc
