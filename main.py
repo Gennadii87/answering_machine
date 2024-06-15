@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from pyrogram import Client, filters, idle
 from pyrogram.errors import UserIsBlocked, UserDeactivated, UserDeactivatedBan, PeerIdInvalid
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from dao.base import get_user, add_user, update_user_status
 from database.database import init_db
 from database.service import check_user_exists
@@ -141,6 +143,7 @@ async def monitor_triggers(user_id: int):
 async def main():
     print("Инициализация базы данных...")
     await init_db()
+
     print("Запуск клиента...")
     await app.start()
     print("Клиент запущен!")
