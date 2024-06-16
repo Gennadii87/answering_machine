@@ -6,6 +6,10 @@ from pyrogram.errors import UserIsBlocked, UserDeactivated, UserDeactivatedBan, 
 from dao.base import get_user, add_user, update_user_status
 
 
+# Хранение активных задач
+active_tasks = {}
+
+
 async def handle_message(client, message):
     """Обработчик сообщений"""
     trigger_phrase = "запустить для пользователя"
@@ -35,7 +39,9 @@ async def handle_message(client, message):
         except ValueError:
             print("Неверный формат идентификатора пользователя")
 
-    await auto_responder(client, user_id)
+    if user_id not in active_tasks:
+        task = asyncio.create_task(auto_responder(client, user_id))
+        active_tasks[user_id] = task
 
 
 async def auto_responder(client, user_id: int):
@@ -88,6 +94,7 @@ async def auto_responder(client, user_id: int):
                                 print(datetime.datetime.now())
                                 await client.send_message(user_id, "msg_3")
 
+                await asyncio.sleep(1)
                 if user_status == "finished":
                     break
 
