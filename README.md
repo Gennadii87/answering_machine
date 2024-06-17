@@ -20,3 +20,5 @@
 </code>
 
 Запуск клиента <pre>`python main.py`</pre> <br/>
+
+Текст сообщений можно редактировать в файле `message_config.ini`
