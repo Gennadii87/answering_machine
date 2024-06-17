@@ -107,6 +107,10 @@ async def auto_responder(client, user_id: int):
 
                             print(f"время {datetime.datetime.now()} - {msg_3}")
 
+                del active_tasks[user_id]
+                if not active_tasks:
+                    break
+
                 await asyncio.sleep(1)
                 if user_status == "finished":
                     break
@@ -123,7 +127,8 @@ async def monitor_triggers(client, user_id: int):
         await asyncio.sleep(2)
         me = await client.get_me()
 
-        if message.text and message.outgoing:
+        # if message.text and message.outgoing:
+        if message.text:
             get_status = message.text.lower() in cancel_triggers
             if get_status:
                 print(f"Обнаружено слово-триггер в чате пользователя {user_id}")
