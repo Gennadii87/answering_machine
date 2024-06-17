@@ -42,6 +42,7 @@ async def handle_message(client, message):
     if user_id not in active_tasks:
         task = asyncio.create_task(auto_responder(client, user_id))
         active_tasks[user_id] = task
+        print(f"задача {active_tasks}")
 
 
 async def auto_responder(client, user_id: int):
@@ -61,9 +62,10 @@ async def auto_responder(client, user_id: int):
 
                     if user_status == "alive":
                         await asyncio.sleep(360)
-                        print(datetime.datetime.now())
                         await client.send_message(user_id, "msg_1")
                         msg_1_sent_time = time.time()
+
+                        print(f"время {datetime.datetime.now()} msg_1")
 
                 if not await monitor_triggers(client, user_id):
 
@@ -74,11 +76,13 @@ async def auto_responder(client, user_id: int):
                         if msg_1_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_1 = current_time - msg_1_sent_time
+                            time_slip_msg2 = interval_since_msg_1 + 2340
 
-                            if interval_since_msg_1 >= 2340:
-                                print(datetime.datetime.now())
-                                await client.send_message(user_id, "msg_2")
-                                msg_2_sent_time = time.time()
+                            await asyncio.sleep(time_slip_msg2)
+                            await client.send_message(user_id, "msg_2")
+                            msg_2_sent_time = time.time()
+
+                            print(f"время {datetime.datetime.now()} msg_2")
 
                 if not await monitor_triggers(client, user_id):
 
@@ -89,10 +93,12 @@ async def auto_responder(client, user_id: int):
                         if msg_2_sent_time is not None:
                             current_time = time.time()
                             interval_since_msg_2 = current_time - msg_2_sent_time
+                            time_slip_msg3 = interval_since_msg_2 + (1 * 24 * 3600 + 2 * 3600)
 
-                            if interval_since_msg_2 >= (1 * 24 * 3600 + 2 * 3600):
-                                print(datetime.datetime.now())
-                                await client.send_message(user_id, "msg_3")
+                            await asyncio.sleep(time_slip_msg3)
+                            await client.send_message(user_id, "msg_3")
+
+                            print(f"время {datetime.datetime.now()} msg_3")
 
                 await asyncio.sleep(1)
                 if user_status == "finished":
