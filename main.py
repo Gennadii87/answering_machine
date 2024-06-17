@@ -34,19 +34,19 @@ async def on_message(client, message):
 
 
 async def main():
+
     print("Инициализация базы данных...")
     await init_db()
 
     print("Запуск клиента...")
-    await app.start()
-    print("Клиент запущен!")
+    async with app:
+        print("Клиент запущен!")
 
-    await idle()
+        await idle()
 
-    print("Остановка клиента...")
-    await asyncio.sleep(1)
-    print("Клиент остановлен!")
+        print("Остановка клиента...")
+        await asyncio.sleep(1)
+        print("Клиент остановлен!")
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    app.run(main())
