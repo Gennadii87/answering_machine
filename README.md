@@ -7,17 +7,12 @@
 
 создайте в postgresQL базу данных с названием `my_client` <br/>
 
-<code>
-
-    POSTGRES_USER=<`полльзователь для базы данных`>
-    POSTGRES_PASSWORD=<`пароль к базе данных`>
+    POSTGRES_USER=<пользователь для базы данных>
+    POSTGRES_PASSWORD=<пароль к базе данных>
     POSTGRES_DB=my_client
     POSTGRES_HOST=localhost:5432
-    
     API_ID=1234567 <укажите ваш id>
-    API_HASH="1234567890" <укажите ваш hash>
-
-</code>
+    API_HASH="1234567890" <укажите ваш hash> 
 
 Запуск клиента <pre>`python main.py`</pre> <br/>
 
