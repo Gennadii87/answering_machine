@@ -68,7 +68,7 @@ async def auto_responder(client, user_id: int):
                     user_status = user.status
 
                     if user_status == "alive":
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(360)
                         await client.send_message(user_id, msg_1)
                         msg_1_sent_time = time.time()
 
