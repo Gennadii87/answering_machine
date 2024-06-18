@@ -19,12 +19,18 @@ active_tasks = {}
 
 
 async def handle_message(client, message):
+
     """Обработчик сообщений"""
+
     trigger_phrase = "Запустить для пользователя"
     user_id = message.from_user.id
+    user = await get_user(user_id)
 
-    if not await get_user(user_id):
+    if not user:
         await add_user(user_id, f"инициализация пользователя {user_id}")
+        status = "alive"
+    else:
+        status = user.status
 
     if not message.from_user.is_self:
         print(f"[Получено от {message.from_user.first_name} {message.from_user.last_name}]: {message.text}")
@@ -61,39 +67,29 @@ async def handle_message(client, message):
         except ValueError:
             print("Неверный формат идентификатора пользователя")
 
-    user = await get_user(user_id)
-    status = user.status
     if user_id not in active_tasks and not message.from_user.is_self and status == 'alive':
-        task = asyncio.create_task(auto_responder(client, user_id))
+        task = asyncio.create_task(auto_responder(client, user_id, status))
         active_tasks[user_id] = task
         print(f"Создана задача {active_tasks}")
-    else:
-        print(f"Воронка не активная для  {user_id}")
+
+    elif user_id in active_tasks:
+        print(f"Воронка для {user_id} статус {status}")
 
 
-async def auto_responder(client, user_id: int):
+async def auto_responder(client, user_id: int, status: str):
 
     """Функция автоответчика"""
 
-    msg_1_sent_time = None
-    msg_2_sent_time = None
-    user = await get_user(user_id)
-    user_status = user.status
     try:
-        if user_status == "alive":
+        if status == "alive":
             while True:
                 await asyncio.sleep(360)
                 if not await monitor_triggers(client):
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                    await client.send_message(user_id, msg_1)
+                    msg_1_sent_time = time.time()
+                    print(f"Время {datetime.datetime.now()} - {msg_1}")
 
-                    if user_status == "alive":
-
-                        await client.send_message(user_id, msg_1)
-                        msg_1_sent_time = time.time()
-
-                        print(f"Время {datetime.datetime.now()} - {msg_1}")
                 else:
                     if user_id in active_tasks:
                         active_tasks[user_id].cancel()
@@ -104,17 +100,13 @@ async def auto_responder(client, user_id: int):
                 await asyncio.sleep(time_slip_msg2)
 
                 if not await monitor_triggers(client):
+                    msg_2_sent_time = None
+                    if msg_1_sent_time is not None:
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                        await client.send_message(user_id, msg_2)
+                        msg_2_sent_time = time.time()
+                        print(f"Время {datetime.datetime.now()} - {msg_2}")
 
-                    if user_status == "alive":
-                        if msg_1_sent_time is not None:
-
-                            await client.send_message(user_id, msg_2)
-                            msg_2_sent_time = time.time()
-
-                            print(f"Время {datetime.datetime.now()} - {msg_2}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
@@ -126,15 +118,10 @@ async def auto_responder(client, user_id: int):
 
                 if not await monitor_triggers(client):
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                    if msg_2_sent_time is not None:
+                        await client.send_message(user_id, msg_3)
+                        print(f"Время {datetime.datetime.now()} - {msg_3}")
 
-                    if user_status == "alive":
-                        if msg_2_sent_time is not None:
-
-                            await client.send_message(user_id, msg_3)
-
-                            print(f"Время {datetime.datetime.now()} - {msg_3}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
