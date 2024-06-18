@@ -20,7 +20,7 @@ active_tasks = {}
 
 async def handle_message(client, message):
     """Обработчик сообщений"""
-    trigger_phrase = "запустить для пользователя"
+    trigger_phrase = "Запустить для пользователя"
     user_id = message.from_user.id
 
     if not await get_user(user_id):
@@ -39,7 +39,7 @@ async def handle_message(client, message):
 
             if not await get_user(target_user_id):
                 me = await client.get_me()
-                await client.send_message(me.id, f"пользователь {target_user_id} не найден.")
+                await client.send_message(me.id, f"Пользователь {target_user_id} не найден.")
 
             await update_user_status(target_user_id, "alive",
                                      f"воронка для пользователя {target_user_id} обновлена")
@@ -66,9 +66,9 @@ async def handle_message(client, message):
     if user_id not in active_tasks and not message.from_user.is_self and status == 'alive':
         task = asyncio.create_task(auto_responder(client, user_id))
         active_tasks[user_id] = task
-        print(f"создана задача {active_tasks}")
+        print(f"Создана задача {active_tasks}")
     else:
-        print(f"воронка не активная для  {user_id}")
+        print(f"Воронка не активная для  {user_id}")
 
 
 async def auto_responder(client, user_id: int):
@@ -93,7 +93,7 @@ async def auto_responder(client, user_id: int):
                         await client.send_message(user_id, msg_1)
                         msg_1_sent_time = time.time()
 
-                        print(f"время {datetime.datetime.now()} - {msg_1}")
+                        print(f"Время {datetime.datetime.now()} - {msg_1}")
                 else:
                     if user_id in active_tasks:
                         active_tasks[user_id].cancel()
@@ -114,7 +114,7 @@ async def auto_responder(client, user_id: int):
                             await client.send_message(user_id, msg_2)
                             msg_2_sent_time = time.time()
 
-                            print(f"время {datetime.datetime.now()} - {msg_2}")
+                            print(f"Время {datetime.datetime.now()} - {msg_2}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
@@ -134,7 +134,7 @@ async def auto_responder(client, user_id: int):
 
                             await client.send_message(user_id, msg_3)
 
-                            print(f"время {datetime.datetime.now()} - {msg_3}")
+                            print(f"Время {datetime.datetime.now()} - {msg_3}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
@@ -167,12 +167,12 @@ async def monitor_triggers(client):
                         user_id, "finished", f"воронка для пользователя {user_id} завершена")
                     me = await client.get_me()
                     await client.send_message(
-                        me.id, f"последовательность сообщений для пользователя {user_id} отменена.")
+                        me.id, f"Последовательность сообщений для пользователя {user_id} отменена.")
 
                     return True
 
         elif user_status != "alive":
-            print(f"воронка с клиентом {user_id} - не активна ⛔")
+            print(f"Воронка с клиентом {user_id} - не активна ⛔")
 
         message_count += 1
         if message_count >= 5:
