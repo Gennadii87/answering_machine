@@ -6,7 +6,7 @@ from pyrogram import Client, filters, idle
 
 from database.database import init_db
 from database.service import check_user_exists
-from handlers import handle_message
+from handlers import handle_message, monitor_triggers
 
 # инициализируем таблицы
 check_user = check_user_exists
@@ -35,9 +35,13 @@ async def on_message(client, message):
 
 async def main():
     print("Инициализация базы данных... \nЗапуск клиента...")
+
     await asyncio.gather(init_db(), app.start())
+    asyncio.create_task(monitor_triggers(app))
     print("Клиент запущен")
+
     await idle()
+
     print("Остановка клиента...")
     await asyncio.sleep(1)
     print("Клиент остановлен!")
