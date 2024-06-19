@@ -6,6 +6,7 @@ from configparser import ConfigParser
 from pyrogram.errors import UserIsBlocked, UserDeactivated, UserDeactivatedBan, PeerIdInvalid
 from dao.base import get_user, add_user, update_user_status, get_all_users
 
+
 config = ConfigParser()
 
 config.read('message_config.ini', encoding='utf-8')
@@ -18,19 +19,27 @@ msg_3 = config.get('pyrogram', 'msg_3')
 active_tasks = {}
 
 
-async def handle_message(client, message):
-    """Обработчик сообщений"""
-    trigger_phrase = "Запустить для пользователя"
-    user_id = message.from_user.id
-
-    if not await get_user(user_id):
-        await add_user(user_id, f"инициализация пользователя {user_id}")
-
+async def message_print(message, me):
     if not message.from_user.is_self:
         print(f"[Получено от {message.from_user.first_name} {message.from_user.last_name}]: {message.text}")
     else:
-        print(f"[Вы]: {message.text}")
-    # ec
+        print(f"[Вы - {me.username}]:  {message.text}")
+
+
+async def handle_message(client, message, me):
+
+    """Обработчик сообщений"""
+
+    trigger_phrase = "Запустить для пользователя"
+    user_id = message.from_user.id
+    user = await get_user(user_id)
+
+    if not user:
+        await add_user(user_id, f"инициализация пользователя {user_id}")
+        status = "alive"
+    else:
+        status = user.status
+
     if message.from_user.is_self and trigger_phrase in message.text:
 
         # Перезапуск воронки и очистка диалога
@@ -38,7 +47,6 @@ async def handle_message(client, message):
             target_user_id = int(message.text.split(trigger_phrase)[-1].strip())
 
             if not await get_user(target_user_id):
-                me = await client.get_me()
                 await client.send_message(me.id, f"Пользователь {target_user_id} не найден.")
 
             await update_user_status(target_user_id, "alive",
@@ -61,39 +69,29 @@ async def handle_message(client, message):
         except ValueError:
             print("Неверный формат идентификатора пользователя")
 
-    user = await get_user(user_id)
-    status = user.status
     if user_id not in active_tasks and not message.from_user.is_self and status == 'alive':
-        task = asyncio.create_task(auto_responder(client, user_id))
+        task = asyncio.create_task(auto_responder(client, user_id, status, me))
         active_tasks[user_id] = task
         print(f"Создана задача {active_tasks}")
-    else:
-        print(f"Воронка не активная для  {user_id}")
+
+    elif user_id in active_tasks:
+        print(f"Воронка для {user_id} статус {status}")
 
 
-async def auto_responder(client, user_id: int):
+async def auto_responder(client, user_id: int, status: str, me):
 
     """Функция автоответчика"""
 
-    msg_1_sent_time = None
-    msg_2_sent_time = None
-    user = await get_user(user_id)
-    user_status = user.status
     try:
-        if user_status == "alive":
+        if status == "alive":
             while True:
                 await asyncio.sleep(360)
-                if not await monitor_triggers(client):
+                if not await monitor_triggers(client, me):
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                    await client.send_message(user_id, msg_1)
+                    msg_1_sent_time = time.time()
+                    print(f"Дата {datetime.datetime.now()} - {msg_1}")
 
-                    if user_status == "alive":
-
-                        await client.send_message(user_id, msg_1)
-                        msg_1_sent_time = time.time()
-
-                        print(f"Время {datetime.datetime.now()} - {msg_1}")
                 else:
                     if user_id in active_tasks:
                         active_tasks[user_id].cancel()
@@ -103,18 +101,14 @@ async def auto_responder(client, user_id: int):
                 time_slip_msg2 = interval_since_msg_1 + 2340
                 await asyncio.sleep(time_slip_msg2)
 
-                if not await monitor_triggers(client):
+                if not await monitor_triggers(client, me):
+                    msg_2_sent_time = None
+                    if msg_1_sent_time is not None:
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                        await client.send_message(user_id, msg_2)
+                        msg_2_sent_time = time.time()
+                        print(f"Дата {datetime.datetime.now()} - {msg_2}")
 
-                    if user_status == "alive":
-                        if msg_1_sent_time is not None:
-
-                            await client.send_message(user_id, msg_2)
-                            msg_2_sent_time = time.time()
-
-                            print(f"Время {datetime.datetime.now()} - {msg_2}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
@@ -124,17 +118,12 @@ async def auto_responder(client, user_id: int):
                 time_slip_msg3 = interval_since_msg_2 + (1 * 24 * 3600 + 2 * 3600)
                 await asyncio.sleep(time_slip_msg3)
 
-                if not await monitor_triggers(client):
+                if not await monitor_triggers(client, me):
 
-                    user = await get_user(user_id)
-                    user_status = user.status
+                    if msg_2_sent_time is not None:
+                        await client.send_message(user_id, msg_3)
+                        print(f"Дата {datetime.datetime.now()} - {msg_3}")
 
-                    if user_status == "alive":
-                        if msg_2_sent_time is not None:
-
-                            await client.send_message(user_id, msg_3)
-
-                            print(f"Время {datetime.datetime.now()} - {msg_3}")
                 else:
                     if user_id in active_tasks:
                         del active_tasks[user_id]
@@ -144,7 +133,7 @@ async def auto_responder(client, user_id: int):
         await update_user_status(user_id, "dead", "заблокирован")
 
 
-async def monitor_triggers(client):
+async def monitor_triggers(client, me):
 
     """Функция для мониторинга триггеров отмены"""
 
@@ -165,7 +154,6 @@ async def monitor_triggers(client):
 
                     await update_user_status(
                         user_id, "finished", f"воронка для пользователя {user_id} завершена")
-                    me = await client.get_me()
                     await client.send_message(
                         me.id, f"Последовательность сообщений для пользователя {user_id} отменена.")
 
