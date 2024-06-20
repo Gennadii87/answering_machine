@@ -56,13 +56,13 @@ async def handle_message(client, message, me):
                 active_tasks[target_user_id].cancel()
                 del active_tasks[target_user_id]
 
-            message_ids = []
+            message_id = []
 
             async for msg in client.get_chat_history(target_user_id):
-                message_ids.append(msg.id)
+                message_id.append(msg.id)
 
-            if message_ids:
-                await client.delete_messages(target_user_id, message_ids)
+            if message_id:
+                await client.delete_messages(target_user_id, message_id)
                 print(f"Диалог с пользователем {target_user_id} очищен.")
 
             print(f"Статус пользователя {target_user_id} обновлен на 'alive'")
