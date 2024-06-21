@@ -1,5 +1,5 @@
 .env
-my_account.session
+app/my_account.session
 text.py
 *.cpython-39.pyc
-my_account.session-journal
+app/my_account.session-journal
