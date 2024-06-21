@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import select, update
-from database.database import async_session
-from database.models import User
+from .. database import async_session
+from .. models import User
 
 
 async def add_user(user_id: int, text: str = None):

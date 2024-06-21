@@ -4,8 +4,8 @@ import asyncio
 from configparser import ConfigParser
 
 from pyrogram.errors import UserIsBlocked, UserDeactivated, UserDeactivatedBan, PeerIdInvalid
-from dao.base import get_user, add_user, update_user_status, get_all_users
 
+from database.dao.base import get_user, add_user, update_user_status, get_all_users
 
 config = ConfigParser()
 
