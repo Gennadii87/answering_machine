@@ -3,3 +3,4 @@ app/my_account.session
 text.py
 *.cpython-39.pyc
 app/my_account.session-journal
+.idea/
